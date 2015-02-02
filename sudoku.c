@@ -10,10 +10,13 @@
 //typedefs
 typedef unsigned short int bool;
 typedef unsigned short int ushort;
+typedef struct {ushort row; ushort column;} Coordinate;
 
 //function prototypes
 void printState(void);
-ushort consistencyCheck(void);
+Coordinate consistencyCheck(void);
+Coordinate convertCartToBox(Coordinate);
+Coordinate convertBoxToCart(Coordinate);
 
 //global variables
 ushort **table;
@@ -35,6 +38,8 @@ int main(int argc, char** argv)
 		else if (row >= 9 || row <= -1 || column >= 9 || column <= -1 || value >= 10 || value <= 0)
 			continue;
 		table[row][column] = value;
+		Coordinate dummy = consistencyCheck();
+		printf("\nconsistency vector:<%hu,%hu>\n", dummy.row, dummy.column);
 	}
 	printState();
 	for (i = 0; i < 9; i++)
@@ -52,9 +57,9 @@ void printState()
 	for (i = 0; i < 9; i++)
 	{
 		if (i%3 == 0)
-			printf("=========================================================================");
+			printf("==========================================================================");
 		else
-			printf("------------------------------------------------------------------------");
+			printf("||------+-------+-------||------+-------+-------||------+-------+-------||");
 		printf("\n||\t|\t|\t||\t|\t|\t||\t|\t|\t||\n|");
 		for (j = 0; j < 9; j++)
 		{
@@ -64,25 +69,85 @@ void printState()
 		}
 		printf("|\n||\t|\t|\t||\t|\t|\t||\t|\t|\t||\n");
 	}
-	printf("=========================================================================");
+	printf("==========================================================================");
 }
 
-ushort consistencyCheck()
+Coordinate consistencyCheck()
 {
-	ushort *rowArray = calloc(9, sizeof(ushort));
-	ushort *columnArray = calloc(9, sizeof(ushort));
-	ushort *boxArray = calloc(9, sizeof(ushort));
-	
 	int i, j;
+	Coordinate returnCoordinate = {10, 10};
 	for (i = 0; i < 9; i++)
 	{
-		for (j = 0; j < 9; j++)
-		{
-			//row
-		}
-	}
+		ushort *rowArray = calloc(9, sizeof(ushort));
+		ushort *columnArray = calloc(9, sizeof(ushort));
+		ushort *boxArray = calloc(9, sizeof(ushort));
 
-	free(rowArray);
-	free(columnArray);
-	free(boxArray);
+		for (j = i; j < 9; j++)
+		{
+			ushort temp;
+			
+			//row check
+			temp = table[i][j];
+			if (temp <= 9 && temp >= 1)
+			{
+				if (rowArray[temp] >= 1)
+				{
+					returnCoordinate.row = i;
+					returnCoordinate.column = j;
+					return returnCoordinate;
+				}
+				else
+					rowArray[temp]++;
+			}
+
+			//column check
+			temp = table[j][i];
+			if (temp <= 9 && temp >= 1)
+			{
+				if (columnArray[temp] >= 1)
+				{
+					returnCoordinate.row = j;
+					returnCoordinate.column = i;
+					return returnCoordinate;
+				}
+				else
+					columnArray[temp]++;
+			}
+
+			//box check
+			Coordinate boxCoord = {i, j};
+			Coordinate cartCoord = convertBoxToCart(boxCoord);
+			temp = table[cartCoord.row][cartCoord.column];
+			if (temp <= 9 && temp >= 1)	
+			{
+				if (boxArray[temp] >= 1)
+				{
+					returnCoordinate = cartCoord;
+					return returnCoordinate;
+				}
+				else
+					boxArray[temp]++;				
+			}
+		}
+		free(rowArray);
+		free(columnArray);
+		free(boxArray);
+	}
+	return returnCoordinate;
+}
+
+Coordinate convertCartToBox(Coordinate argCoordinate)
+{
+	ushort x = argCoordinate.row;
+	ushort y = argCoordinate.column;
+	Coordinate returnCoord = {y / 3 + 3 * (x / 3), (y%3 + 3 * x)%9};
+	return returnCoord;
+}
+
+Coordinate convertBoxToCart(Coordinate argCoordinate)
+{
+	ushort u = argCoordinate.row;
+	ushort v = argCoordinate.column;
+	Coordinate returnCoord = {(u/3) * 3 + v/3, (u%3) * 3 + v%3};
+	return returnCoord;
 }
