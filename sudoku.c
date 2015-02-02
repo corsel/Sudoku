@@ -10,10 +10,12 @@
 //typedefs
 typedef unsigned short int bool;
 typedef unsigned short int ushort;
+typedef unsigned short int bitwise;
 typedef struct {ushort row; ushort column;} Coordinate;
 
 //function prototypes
 void printState(void);
+bool simpleFill(void);
 Coordinate consistencyCheck(void);
 Coordinate convertCartToBox(Coordinate);
 Coordinate convertBoxToCart(Coordinate);
@@ -70,6 +72,36 @@ void printState()
 		printf("|\n||\t|\t|\t||\t|\t|\t||\t|\t|\t||\n");
 	}
 	printf("==========================================================================");
+}
+
+bool simpleFill()
+{
+	int i, j, k;
+	for (i = 0; i < 9; i++)
+	{
+		for (j = 0; j < 9; j++)
+		{
+			if (table[i][j] != 0) continue;
+			bitwise taken = 0x00;
+			for (k = 0; k < 9; k++)
+			{
+				ushort temp;
+				bitwise tempBitwise = 0x00;
+
+				//row fill	
+				temp = table[i][k];
+				tempBitwise |= 0x01<<(temp-1);
+
+				//column fill
+				temp = table[k][j];
+				tempBitwise |= 0x01<<(temp-1);
+
+				//box fill
+				Coordinate cartCoord = {i, j};
+				Coordinate boxCoord = convertCartToBox(cartCoord);
+			}
+		}
+	}
 }
 
 Coordinate consistencyCheck()
