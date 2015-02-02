@@ -7,12 +7,16 @@
 #define BLUE_COLOR "\x1B[34m"
 #define WHITE_COLOR "\x1B[37m"
 
+//typedefs
+typedef unsigned short int bool;
+typedef unsigned short int ushort;
+
 //function prototypes
 void printState(void);
-int consistencyCheck(void);
+ushort consistencyCheck(void);
 
 //global variables
-unsigned short int **table;
+ushort **table;
 
 int main(int argc, char** argv)
 {
@@ -20,17 +24,11 @@ int main(int argc, char** argv)
 	int i;
 	for (i = 0; i < 9; i++)
 	{
-		table[i] = malloc(9 * sizeof(unsigned short int));
-		int j;
-		for (j = 0; j < 9; j++)
-		{
-			table[i][j] = 0;
-		}
+		table[i] = calloc(9, sizeof(ushort));
 	}
-	printf("%s%lu%s\n", RED_COLOR, sizeof(unsigned char), WHITE_COLOR);
 	while(1)
 	{
-		unsigned short int row, column, value;
+		ushort row, column, value;
 		scanf("%1hu %1hu %1hu", &row, &column, &value);
 		if (value == 0)
 			break;
@@ -39,6 +37,11 @@ int main(int argc, char** argv)
 		table[row][column] = value;
 	}
 	printState();
+	for (i = 0; i < 9; i++)
+	{
+		free(table[i]);
+	}
+	free(table);
 	int a; scanf("%i", &a);
 	return 0;
 }
@@ -49,16 +52,37 @@ void printState()
 	for (i = 0; i < 9; i++)
 	{
 		if (i%3 == 0)
-			printf("\n\n ========================================================================\n\n|");
+			printf("=========================================================================");
 		else
-			printf("\n\n ------------------------------------------------------------------------\n\n|");
-
+			printf("------------------------------------------------------------------------");
+		printf("\n||\t|\t|\t||\t|\t|\t||\t|\t|\t||\n|");
 		for (j = 0; j < 9; j++)
 		{
 			if (j%3 == 0)
 				printf("|");
 			printf("   %hu\t|", table[i][j]);
 		}
+		printf("|\n||\t|\t|\t||\t|\t|\t||\t|\t|\t||\n");
 	}
-	printf("\n\n ========================================================================\n\n");
+	printf("=========================================================================");
+}
+
+ushort consistencyCheck()
+{
+	ushort *rowArray = calloc(9, sizeof(ushort));
+	ushort *columnArray = calloc(9, sizeof(ushort));
+	ushort *boxArray = calloc(9, sizeof(ushort));
+	
+	int i, j;
+	for (i = 0; i < 9; i++)
+	{
+		for (j = 0; j < 9; j++)
+		{
+			//row
+		}
+	}
+
+	free(rowArray);
+	free(columnArray);
+	free(boxArray);
 }
