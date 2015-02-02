@@ -26,7 +26,7 @@ ushort **table;
 int main(int argc, char** argv)
 {
 	table = malloc(9 * sizeof(void*));
-	int i;
+	ushort i;
 	for (i = 0; i < 9; i++)
 	{
 		table[i] = calloc(9, sizeof(ushort));
@@ -82,24 +82,31 @@ bool simpleFill()
 		for (j = 0; j < 9; j++)
 		{
 			if (table[i][j] != 0) continue;
-			bitwise taken = 0x00;
+			bitwise taken = 0x0000;
 			for (k = 0; k < 9; k++)
 			{
 				ushort temp;
-				bitwise tempBitwise = 0x00;
 
 				//row fill	
 				temp = table[i][k];
-				tempBitwise |= 0x01<<(temp-1);
+				if (temp != 0)
+					taken |= 0x0001<<(temp-1);
 
 				//column fill
 				temp = table[k][j];
-				tempBitwise |= 0x01<<(temp-1);
+				if (temp != 0)
+					taken |= 0x0001<<(temp-1);
 
 				//box fill
 				Coordinate cartCoord = {i, j};
 				Coordinate boxCoord = convertCartToBox(cartCoord);
+				boxCoord.column = k;
+				Coordinate tempCartCoord = convertBoxToCart(boxCoord);
+				temp = table[tempCartCoord.row][tempCartCoord.column];
+				if (temp != 0)
+					taken |= 0x0001<<(temp-1);
 			}
+			
 		}
 	}
 }
