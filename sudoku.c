@@ -6,7 +6,6 @@
 #define GREEN_COLOR "\x1B[32m"
 #define BLUE_COLOR "\x1B[34m"
 #define WHITE_COLOR "\x1B[37m"
-#define debugMessage printf
 
 //typedefs
 typedef unsigned short int bool;
@@ -20,10 +19,7 @@ bool simpleFill(void);
 Coordinate consistencyCheck(void);
 Coordinate convertCartToBox(Coordinate);
 Coordinate convertBoxToCart(Coordinate);
-
-//Debug
-void testFillBox(void);
-void testFillRow(void);
+void testEasySample(void);
 
 //global variables
 ushort **table;
@@ -36,7 +32,6 @@ int main(int argc, char** argv)
 	{
 		table[i] = calloc(9, sizeof(ushort));
 	}	
-	testFillRow();
 	while(1)
 	{
 		ushort row, column, value;
@@ -47,10 +42,9 @@ int main(int argc, char** argv)
 			continue;
 		table[row][column] = value;
 		Coordinate dummy = consistencyCheck();
-		printf("\nconsistency vector:<%hu,%hu>\n", dummy.row, dummy.column);
 	}
 	printState();
-	simpleFill();
+	while (simpleFill());
 	printState();
 	for (i = 0; i < 9; i++)
 	{
@@ -85,7 +79,10 @@ void printState()
 
 bool simpleFill()
 {
+	static int iterations = 0;
+	iterations++;
 	int i, j, k;
+	bool numberFound = 0;
 	for (i = 0; i < 9; i++)
 	{
 		for (j = 0; j < 9; j++)
@@ -116,13 +113,8 @@ bool simpleFill()
 					taken |= (0x0001<<(temp-1));
 			}
 			taken = ~taken;
-			if (i == 1 && j == 1)
-			{
-				debugMessage("\ntaken bit for <%hu,%hu> is %x\n", i, j, taken);
-			}
 			if ((taken & (taken - 1)) == 0)
 			{	
-				debugMessage("\nSingle set bit.");
 				ushort setBitPosition = 0;
 				for (k = 0; k < 9; k++)	
 				{
@@ -133,9 +125,12 @@ bool simpleFill()
 					}
 					setBitPosition++;
 				}
+				numberFound = 1;
 			}
 		}
 	}
+	printf("\niteration %i...", iterations); 
+	return numberFound;
 }
 
 Coordinate consistencyCheck()
@@ -218,26 +213,55 @@ Coordinate convertBoxToCart(Coordinate argCoordinate)
 	return returnCoord;
 }
 
-void testFillBox()
+void testEasySample()
 {
-	table[0][0] = 1;
-	table[0][1] = 2;
-	table[0][2] = 3;
 	table[1][0] = 4;
-	table[1][2] = 6;
-	table[2][0] = 7;
-	table[2][1] = 8;
-	table[2][2] = 9;
-}
+	table[2][0] = 5;
+	table[6][0] = 7;
+	table[8][0] = 2;
 
-void testFillRow()
-{
-	table[0][0] = 1;
-	table[0][1] = 2;
-	table[0][2] = 3;
-	table[0][3] = 4;
-	table[0][5] = 6;
-	table[0][6] = 7;
-	table[0][7] = 8;
-	table[0][8] = 9;
+	table[2][1] = 8;
+	table[4][1] = 4;
+	table[7][1] = 6;
+	table[8][1] = 3;
+
+	table[0][2] = 2;
+	table[1][2] = 3;
+	table[3][2] = 9;
+	table[4][2] = 7;
+	table[8][2] = 4;
+
+	table[0][3] = 6;
+	table[2][3] = 9;
+	table[4][3] = 2;
+	table[6][3] = 4;
+
+	table[1][4] = 8;
+	table[2][4] = 2;
+	table[3][4] = 4;
+	table[4][4] = 5;
+	table[5][4] = 7;
+	table[6][4] = 6;
+	table[7][4] = 1;
+
+	table[2][5] = 7;
+	table[4][5] = 8;
+	table[6][5] = 2;
+	table[8][5] = 5;
+
+	table[0][6] = 5;
+	table[4][6] = 3;
+	table[5][6] = 6;
+	table[7][6] = 4;
+	table[8][6] = 8;
+
+	table[0][7] = 9;
+	table[1][7] = 2;
+	table[4][7] = 1;
+	table[6][7] = 5;
+
+	table[0][8] = 8;
+	table[2][8] = 4;
+	table[6][8] = 3;
+	table[7][8] = 2;
 }
