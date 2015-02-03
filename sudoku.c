@@ -6,6 +6,7 @@
 #define GREEN_COLOR "\x1B[32m"
 #define BLUE_COLOR "\x1B[34m"
 #define WHITE_COLOR "\x1B[37m"
+#define debugMessage printf
 
 //typedefs
 typedef unsigned short int bool;
@@ -20,6 +21,10 @@ Coordinate consistencyCheck(void);
 Coordinate convertCartToBox(Coordinate);
 Coordinate convertBoxToCart(Coordinate);
 
+//Debug
+void testFillBox(void);
+void testFillRow(void);
+
 //global variables
 ushort **table;
 
@@ -30,7 +35,8 @@ int main(int argc, char** argv)
 	for (i = 0; i < 9; i++)
 	{
 		table[i] = calloc(9, sizeof(ushort));
-	}
+	}	
+	testFillRow();
 	while(1)
 	{
 		ushort row, column, value;
@@ -44,6 +50,8 @@ int main(int argc, char** argv)
 		printf("\nconsistency vector:<%hu,%hu>\n", dummy.row, dummy.column);
 	}
 	printState();
+	simpleFill();
+	printState();
 	for (i = 0; i < 9; i++)
 	{
 		free(table[i]);
@@ -56,6 +64,7 @@ int main(int argc, char** argv)
 void printState()
 {
 	int i, j;
+	printf("\n");
 	for (i = 0; i < 9; i++)
 	{
 		if (i%3 == 0)
@@ -82,7 +91,7 @@ bool simpleFill()
 		for (j = 0; j < 9; j++)
 		{
 			if (table[i][j] != 0) continue;
-			bitwise taken = 0x0000;
+			bitwise taken = 0xfe00;
 			for (k = 0; k < 9; k++)
 			{
 				ushort temp;
@@ -90,12 +99,12 @@ bool simpleFill()
 				//row fill	
 				temp = table[i][k];
 				if (temp != 0)
-					taken |= 0x0001<<(temp-1);
+					taken |= (0x0001<<(temp-1));
 
 				//column fill
 				temp = table[k][j];
 				if (temp != 0)
-					taken |= 0x0001<<(temp-1);
+					taken |= (0x0001<<(temp-1));
 
 				//box fill
 				Coordinate cartCoord = {i, j};
@@ -104,9 +113,27 @@ bool simpleFill()
 				Coordinate tempCartCoord = convertBoxToCart(boxCoord);
 				temp = table[tempCartCoord.row][tempCartCoord.column];
 				if (temp != 0)
-					taken |= 0x0001<<(temp-1);
+					taken |= (0x0001<<(temp-1));
 			}
-			
+			taken = ~taken;
+			if (i == 1 && j == 1)
+			{
+				debugMessage("\ntaken bit for <%hu,%hu> is %x\n", i, j, taken);
+			}
+			if ((taken & (taken - 1)) == 0)
+			{	
+				debugMessage("\nSingle set bit.");
+				ushort setBitPosition = 0;
+				for (k = 0; k < 9; k++)	
+				{
+					if ((taken >> setBitPosition) & 0x0001)
+					{
+						table[i][j] = setBitPosition + 1;					
+						break;
+					}
+					setBitPosition++;
+				}
+			}
 		}
 	}
 }
@@ -189,4 +216,28 @@ Coordinate convertBoxToCart(Coordinate argCoordinate)
 	ushort v = argCoordinate.column;
 	Coordinate returnCoord = {(u/3) * 3 + v/3, (u%3) * 3 + v%3};
 	return returnCoord;
+}
+
+void testFillBox()
+{
+	table[0][0] = 1;
+	table[0][1] = 2;
+	table[0][2] = 3;
+	table[1][0] = 4;
+	table[1][2] = 6;
+	table[2][0] = 7;
+	table[2][1] = 8;
+	table[2][2] = 9;
+}
+
+void testFillRow()
+{
+	table[0][0] = 1;
+	table[0][1] = 2;
+	table[0][2] = 3;
+	table[0][3] = 4;
+	table[0][5] = 6;
+	table[0][6] = 7;
+	table[0][7] = 8;
+	table[0][8] = 9;
 }
