@@ -16,6 +16,7 @@ typedef struct {ushort row; ushort column;} Coordinate;
 //function prototypes
 void printState(void);
 bool simpleFill(void);
+bool availabilityMatrix(void);
 Coordinate consistencyCheck(void);
 Coordinate convertCartToBox(Coordinate);
 Coordinate convertBoxToCart(Coordinate);
@@ -32,6 +33,7 @@ int main(int argc, char** argv)
 	{
 		table[i] = calloc(9, sizeof(ushort));
 	}	
+	//testEasySample();
 	while(1)
 	{
 		ushort row, column, value;
@@ -131,6 +133,11 @@ bool simpleFill()
 	}
 	printf("\niteration %i...", iterations); 
 	return numberFound;
+}
+
+bool availabilityMatrix()
+{
+
 }
 
 Coordinate consistencyCheck()
