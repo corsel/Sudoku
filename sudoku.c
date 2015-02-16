@@ -135,9 +135,14 @@ bool simpleFill()
 	return numberFound;
 }
 
-bool availabilityMatrix()
+bool availabilityArray(ushort argRow, ushort argColumn)
 {
-
+	bitwise *returnArray;
+	ushort i;
+	for (i = 0; i < 9; i++)
+	{
+		
+	}
 }
 
 Coordinate consistencyCheck()
